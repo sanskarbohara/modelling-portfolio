@@ -433,5 +433,27 @@
   </div>
 </footer>
 
+<script>
+/* Force a real file download for the comp card (some browsers open PDFs in a tab instead) */
+(function(){
+  var btn=document.querySelector('.btn-download');
+  if(!btn||!window.fetch||!window.URL) return;
+  btn.addEventListener('click',function(e){
+    e.preventDefault();
+    var url=btn.getAttribute('href');
+    fetch(url,{cache:'no-cache'})
+      .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.blob(); })
+      .then(function(b){
+        var f=new Blob([b],{type:'application/octet-stream'});
+        var u=URL.createObjectURL(f);
+        var a=document.createElement('a');
+        a.href=u; a.download='sanskar-compcard.pdf';
+        document.body.appendChild(a); a.click();
+        setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(u); },1500);
+      })
+      .catch(function(){ window.location.href=url; });
+  });
+})();
+</script>
 </body>
 </html>
